@@ -56,10 +56,7 @@
 
 - name: PostgreSQL | Initialize the database | RedHat
   command: >
-    {{ postgresql_bin_directory }}/initdb -D {{ postgresql_data_directory }}
-    --locale={{ postgresql_locale }} --encoding={{ postgresql_encoding }}
-  become: yes
-  become_user: "{{ postgresql_service_user }}"
+    postgresql-setup initdb
   when: ansible_os_family == "RedHat" and
         (postgresql_cluster_reset or
          pgdata_dir_exist.changed or
@@ -130,19 +127,19 @@
     group: "{{ postgresql_service_group }}"
     mode: 0755
 
-- name: PostgreSQL | Ensure the systemd directory for PostgreSQL exists | RedHat
-  file:
-    name: "/etc/systemd/system/postgresql-{{ postgresql_version }}.service.d"
-    state: directory
-    mode: 0755
-  when: ansible_os_family == "RedHat"
+#- name: PostgreSQL | Ensure the systemd directory for PostgreSQL exists | RedHat
+#  file:
+#    name: "/etc/systemd/system/postgresql-{{ postgresql_version }}.service.d"
+#    state: directory
+#    mode: 0755
+#  when: ansible_os_family == "RedHat"
 
-- name: PostgreSQL | Use the conf directory when starting the Postgres service | RedHat
-  template:
-    src: etc_systemd_system_postgresql.service.d_custom.conf.j2
-    dest: "/etc/systemd/system/postgresql-{{ postgresql_version }}.service.d/custom.conf"
-  when: ansible_os_family == "RedHat"
-  register: postgresql_systemd_custom_conf
+#- name: PostgreSQL | Use the conf directory when starting the Postgres service | RedHat
+#  template:
+#    src: etc_systemd_system_postgresql.service.d_custom.conf.j2
+#    dest: "/etc/systemd/system/postgresql-{{ postgresql_version }}.service.d/custom.conf"
+#  when: ansible_os_family == "RedHat"
+#  register: postgresql_systemd_custom_conf
 
 - name: PostgreSQL | Ensure the pid directory for PostgreSQL exists
   file:
